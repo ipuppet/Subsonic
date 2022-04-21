@@ -1,0 +1,16 @@
+"ALERT_INFO" = "提示";
+"NONE" = "什么都没有";
+"FAILED_TO_LOAD_VIEW" = "加载视图失败";
+"VIEW_NOT_PROVIDED" = "未提供该视图";
+"CHECK_UPDATE" = "检查更新";
+"UPDATE" = "更新";
+"CLEAR" = "清除";
+"CLEAR_CACHE" = "清除缓存";
+"CLEAR_CACHE_MESSAGE" = "您是否确认清除所有缓存？";
+
+"SEARCH" = "搜索";
+
+"LIBRARY" = "资料库";
+"ALBUMS" = "专辑";
+"SONGS" = "歌曲";
+"ARTISTS" = "艺术家";
