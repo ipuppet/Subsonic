@@ -117,7 +117,8 @@ class AppKernel extends Kernel {
             })
         }
 
-        this.setting.method.clearCache = () => {
+        this.setting.method.clearCache = animate => {
+            animate.touchHighlight()
             $ui.alert({
                 title: $l10n("CLEAR_CACHE"),
                 message: $l10n("CLEAR_CACHE_MESSAGE"),

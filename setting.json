@@ -87,7 +87,7 @@
                 ],
                 "title": "CLEAR_CACHE",
                 "type": "script",
-                "key": "checkUpdate",
+                "key": "clearCache",
                 "value": "this.method.clearCache"
             },
             {
