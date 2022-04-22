@@ -144,6 +144,7 @@ class Songs {
         pageController.navigationItem
             .setTitle(this.title)
             .setTitleView(searchBar)
+            .pinTitleView()
             .setFixedFooterView(this.kernel.player.fixedFooterView())
         if (!this.hasSource) {
             pageController.navigationItem.addRightButton({
