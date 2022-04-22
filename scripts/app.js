@@ -39,22 +39,6 @@ class AppKernel extends Kernel {
         this.player = new Player(this)
     }
 
-    deleteConfirm(message, conformAction) {
-        $ui.alert({
-            title: message,
-            actions: [
-                {
-                    title: $l10n("DELETE"),
-                    style: $alertActionType.destructive,
-                    handler: () => {
-                        conformAction()
-                    }
-                },
-                { title: $l10n("CANCEL") }
-            ]
-        })
-    }
-
     /**
      * 注入设置中的脚本类型方法
      */
@@ -127,7 +111,10 @@ class AppKernel extends Kernel {
                         title: $l10n("CLEAR"),
                         style: $alertActionType.destructive,
                         handler: () => {
-                            conformAction()
+                            animate.actionStart()
+                            this.subsonic.fileStorage.delete("/")
+                            $cache.clear()
+                            $delay(0.3, () => animate.actionDone())
                         }
                     },
                     { title: $l10n("CANCEL") }
@@ -140,7 +127,17 @@ class AppKernel extends Kernel {
 class AppUI {
     static renderMainUI() {
         const kernel = new AppKernel()
-        const buttons = {
+
+        kernel.tabBarController = new TabBarController()
+        kernel.tabBarController.setHeader(kernel.player.tabBarHeader())
+
+        const homePageController = kernel.home.getPageController()
+        kernel.home.viewController.setRootPageController(homePageController)
+
+        kernel.tabBarController.setPages({
+            home: homePageController.getPage(),
+            setting: kernel.setting.getPageView()
+        }).setCells({
             home: {
                 icon: "square.stack",
                 title: $l10n("LIBRARY")
@@ -149,17 +146,6 @@ class AppUI {
                 icon: "gear",
                 title: $l10n("SETTING")
             }
-        }
-
-        kernel.tabBarController = new TabBarController()
-        const homePageController = kernel.home.getPageController()
-        kernel.home.viewController.setRootPageController(homePageController)
-        kernel.tabBarController.setPages({
-            home: homePageController.getPage(),
-            setting: kernel.setting.getPageView()
-        }).setCells({
-            home: buttons.home,
-            setting: buttons.setting
         })
 
         kernel.UIRender(kernel.tabBarController.generateView().definition)

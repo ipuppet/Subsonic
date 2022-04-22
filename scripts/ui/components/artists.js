@@ -18,6 +18,11 @@ class Artists {
         this.rowHeight = 60
     }
 
+    setViewController(viewController) {
+        this.viewController = viewController
+        return this
+    }
+
     async init() {
         this.artistIndexes = await this.kernel.subsonic.getIndexes()
         this.artistIndexesKeys = Object.keys(this.artistIndexes)
@@ -109,8 +114,8 @@ class Artists {
                 didSelect: (sender, indexPath, data) => {
                     const id = data.info.info.id
                     const artist = new Artist(this.kernel)
-                    artist.init(id).then(() => {
-                        this.kernel.home.viewController.push(artist.getPageController())
+                    artist.setViewController(this.viewController).init(id).then(() => {
+                        this.viewController.push(artist.getPageController())
                     })
                 }
             }
@@ -125,7 +130,7 @@ class Artists {
         pageController.navigationItem
             .setTitle($l10n("ARTISTS"))
             .setTitleView(searchBar)
-            .setFixedFooterView(this.kernel.player.fixedFooterView("artists"))
+            .setFixedFooterView(this.kernel.player.fixedFooterView())
             .addRightButton({
                 symbol: "paperplane",
                 menu: {

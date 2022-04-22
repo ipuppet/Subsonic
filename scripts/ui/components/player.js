@@ -1,6 +1,7 @@
 const {
     UIKit,
-    FixedFooterView
+    FixedFooterView,
+    TabBarHeaderView
 } = require("../../lib/easy-jsbox")
 
 class Artist {
@@ -35,9 +36,9 @@ class Artist {
         }
     }
 
-    fixedFooterView(baseId, hasTabBar = false) {
-        this.baseId.push(baseId)
-        const fixedFooterView = new FixedFooterView({
+    miniView(baseId) {
+        this.baseId.push(baseId ?? this.kernel.uuid())
+        return {
             views: [
                 UIKit.separatorLine(),
                 { // image
@@ -170,9 +171,15 @@ class Artist {
                     }
                 }
             ]
-        })
-        fixedFooterView.hasTabBar = hasTabBar
-        return fixedFooterView
+        }
+    }
+
+    tabBarHeader(baseId) {
+        return new TabBarHeaderView(this.miniView(baseId))
+    }
+
+    fixedFooterView(baseId) {
+        return new FixedFooterView(this.miniView(baseId))
     }
 
     updatePlayNow() {

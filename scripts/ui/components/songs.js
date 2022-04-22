@@ -18,6 +18,11 @@ class Songs {
         this.rowHeight = 60
     }
 
+    setViewController(viewController) {
+        this.viewController = viewController
+        return this
+    }
+
     async init(songs, title = $l10n("SONGS")) {
         this.title = title
 
@@ -34,7 +39,9 @@ class Songs {
         }
     }
 
-    searchAction(text) { }
+    get menuData() {
+        return {}
+    }
 
     get listData() {
         return this.songs.map(item => ({
@@ -117,14 +124,10 @@ class Songs {
     }
 
     getPageController() {
-        const searchBar = new SearchBar()
-        // 初始化搜索功能
-        searchBar.controller.setEvent("onChange", text => this.searchAction(text))
         const pageController = new PageController()
         pageController.navigationItem
             .setTitle(this.title)
-            .setFixedFooterView(this.kernel.player.fixedFooterView("songs"))
-        //.setTitleView(searchBar)
+            .setFixedFooterView(this.kernel.player.fixedFooterView())
         if (!this.hasSource) {
             pageController.navigationItem.addRightButton({
                 symbol: "arrow.clockwise",

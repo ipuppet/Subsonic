@@ -1,4 +1,4 @@
-const { compressImage } = require("./easy-jsbox")
+const { compressImage, FileStorage } = require("./easy-jsbox")
 
 class SubsonicParameterError extends Error {
     constructor(parameter) {
@@ -24,10 +24,13 @@ class Subsonic {
         if (host && host[host.length - 1] === "/") {
             host = host.slice(0, host.length - 1)
         }
+        if (!host.startsWith("http")) {
+            host + "https://" + host
+        }
         this.host = host
         this.username = username
         this.password = password
-        this.fileStorage = fileStorage
+        this.fileStorage = fileStorage ?? new FileStorage("storage/tmp")
         this.init()
     }
 
@@ -80,16 +83,18 @@ class Subsonic {
     }
 
     request(method, parameter = {}, isCache = true) {
+        const displayError = message => {
+            $ui.error(message)
+            console.error(message)
+        }
+
         try {
             this.#checkParameter()
         } catch (error) {
             $delay(0.3, () => {
-                $ui.toast("Please Login")
+                displayError("Please Login")
             })
-        }
-        const displayError = message => {
-            $ui.error(message)
-            console.error(message)
+            return new Promise((resolve, reject) => { reject(error) })
         }
 
         const cacheKey = this.cacheKey(method, parameter)
@@ -97,7 +102,7 @@ class Subsonic {
         return new Promise(async (resolve, reject) => {
             try {
                 if (isCache) {
-                    const cache = this.fileStorage.read("request", cacheKey)
+                    const cache = this.fileStorage.read("request", cacheKey).string
                     const xml = $xml.parse({
                         string: cache,
                         mode: "xml"
@@ -292,12 +297,34 @@ class Subsonic {
         return new Promise(async (resolve, reject) => {
             this.request("getRandomSongs", {
                 size
-            }, false).then(root => {
+            }).then(root => {
                 resolve(root.firstChild({
                     tag: "randomSongs"
                 }).children({
                     tag: "song"
                 }).map(item => item.attributes))
+            }).catch(e => reject(e))
+        })
+    }
+
+    getStarred2() {
+        return new Promise(async (resolve, reject) => {
+            this.request("getStarred2").then(root => {
+                const starred2 = root.firstChild({
+                    tag: "starred2"
+                })
+                const data = {
+                    artist: starred2.children({
+                        tag: "artist"
+                    }).map(item => item.attributes),
+                    album: starred2.children({
+                        tag: "album"
+                    }).map(item => item.attributes),
+                    song: starred2.children({
+                        tag: "song"
+                    }).map(item => item.attributes)
+                }
+                resolve(data)
             }).catch(e => reject(e))
         })
     }

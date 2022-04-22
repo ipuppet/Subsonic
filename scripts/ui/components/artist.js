@@ -8,6 +8,11 @@ class Artist {
         this.albums = new Albums(kernel)
     }
 
+    setViewController(viewController) {
+        this.viewController = viewController
+        return this
+    }
+
     async init(id) {
         await this.kernel.subsonic.getArtist(id).then(artist => {
             this.artist = artist
@@ -15,7 +20,7 @@ class Artist {
     }
 
     getPageController() {
-        this.albums.init(this.artist.albums, this.artist.name)
+        this.albums.setViewController(this.viewController).init(this.artist.albums, this.artist.name)
         return this.albums.getPageController()
     }
 }

@@ -4,10 +4,10 @@ const {
     ViewController
 } = require("../lib/easy-jsbox")
 
-class Home {
+class Star {
     constructor(kernel) {
         this.kernel = kernel
-        this.listId = "home-list"
+        this.listId = "star-list"
         this.viewController = new ViewController()
         this.viewController.setEvent("onPop", () => {
             this.kernel.player.baseId.pop()
@@ -147,7 +147,7 @@ class Home {
     getPageController() {
         const pageController = new PageController()
         pageController.navigationItem
-            .setTitle($l10n("LIBRARY"))
+            .setTitle($l10n("STAR"))
         pageController
             .navigationController
             .navigationBar
@@ -163,4 +163,4 @@ class Home {
     }
 }
 
-module.exports = Home
+module.exports = Star

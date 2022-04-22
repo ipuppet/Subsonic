@@ -22,6 +22,11 @@ class Albums {
         this.infoHeight = 40
     }
 
+    setViewController(viewController) {
+        this.viewController = viewController
+        return this
+    }
+
     init(albums, title = $l10n("ALBUMS")) {
         this.title = title
 
@@ -130,8 +135,8 @@ class Albums {
                     const info = data.info.info
                     this.kernel.subsonic.getAlbum(info.id).then(album => {
                         const songs = new Songs(this.kernel)
-                        songs.init(album.songs, info.name)
-                        this.kernel.home.viewController.push(songs.getPageController())
+                        songs.setViewController(this.viewController).init(album.songs, info.name)
+                        this.viewController.push(songs.getPageController())
                     })
                 },
                 didReachBottom: sender => {
@@ -158,7 +163,7 @@ class Albums {
         pageController.navigationItem
             .setTitle(this.title)
             .setTitleView(searchBar)
-            .setFixedFooterView(this.kernel.player.fixedFooterView("albums"))
+            .setFixedFooterView(this.kernel.player.fixedFooterView())
         pageController
             .navigationController
             .navigationBar
