@@ -41,14 +41,43 @@ class Songs {
 
     searchAction(text) {
         this.searchTask?.cancel()
+        text = text.trim()
+        if (text === "") {
+            return
+        }
         this.searchTask = $delay(0.5, () => {
             let index = 0
             for (index = 0; index < this.songs.length; index++) {
-                if (this.songs[index]?.title?.includes(text)) {
+                const title = this.songs[index]?.title?.toLowerCase()
+                if (title.includes(text.toLowerCase())) {
                     break
                 }
             }
-            $(this.listId).scrollTo({ indexPath: $indexPath(0, index) })
+            if (index < this.songs.length) {
+                $(this.listId).scrollToOffset($point(0, index * this.rowHeight))
+
+                // highlight
+                $delay(0.8, () => {
+                    $ui.animate({
+                        duration: 0.4,
+                        animation: () => {
+                            $(this.listId).cell($indexPath(0, index)).bgcolor = $color("lightGray")
+                        },
+                        completion: () => {
+                            $delay(0.4, () => {
+                                $ui.animate({
+                                    duration: 0.4,
+                                    animation: () => {
+                                        $(this.listId).cell($indexPath(0, index)).bgcolor = UIKit.primaryViewBackgroundColor
+                                    }
+                                })
+                            })
+                        }
+                    })
+                })
+            } else {
+                $ui.toast($l10n("NO_RESULTS"))
+            }
         })
     }
 

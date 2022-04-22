@@ -183,7 +183,7 @@ class Albums {
         const pageController = new PageController()
         pageController.navigationItem
             .setTitle(this.title)
-            .setTitleView(searchBar)
+            // TODO .setTitleView(searchBar)
             .setFixedFooterView(this.kernel.player.fixedFooterView())
         pageController
             .navigationController

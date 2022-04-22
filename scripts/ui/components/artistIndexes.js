@@ -147,7 +147,7 @@ class ArtistIndexes {
         const pageController = new PageController()
         pageController.navigationItem
             .setTitle($l10n("ARTISTS"))
-            .setTitleView(searchBar)
+            // TODO .setTitleView(searchBar)
             .setFixedFooterView(this.kernel.player.fixedFooterView())
             .addRightButton({
                 symbol: "paperplane",
