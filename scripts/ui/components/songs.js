@@ -39,6 +39,19 @@ class Songs {
         }
     }
 
+    searchAction(text) {
+        this.searchTask?.cancel()
+        this.searchTask = $delay(0.5, () => {
+            let index = 0
+            for (index = 0; index < this.songs.length; index++) {
+                if (this.songs[index]?.title?.includes(text)) {
+                    break
+                }
+            }
+            $(this.listId).scrollTo({ indexPath: $indexPath(0, index) })
+        })
+    }
+
     get menuData() {
         return {}
     }
@@ -124,9 +137,13 @@ class Songs {
     }
 
     getPageController() {
+        const searchBar = new SearchBar()
+        // 初始化搜索功能
+        searchBar.controller.setEvent("onChange", text => this.searchAction(text))
         const pageController = new PageController()
         pageController.navigationItem
             .setTitle(this.title)
+            .setTitleView(searchBar)
             .setFixedFooterView(this.kernel.player.fixedFooterView())
         if (!this.hasSource) {
             pageController.navigationItem.addRightButton({

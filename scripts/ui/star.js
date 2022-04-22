@@ -132,7 +132,7 @@ class Star {
                     const view = new Component(this.kernel)
                     sender.cell(indexPath).get("spinner").hidden = false
                     sender.cell(indexPath).get("rightBtn").hidden = true
-                    view.setViewController(this.viewController).init(this.starred[id]).then(() => {
+                    view.setViewController(this.viewController).init(this.starred[id] ?? []).then(() => {
                         sender.cell(indexPath).get("spinner").hidden = true
                         sender.cell(indexPath).get("rightBtn").hidden = false
                         this.viewController.push(view.getPageController())

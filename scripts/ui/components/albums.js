@@ -27,7 +27,7 @@ class Albums {
         return this
     }
 
-    init(albums, title = $l10n("ALBUMS")) {
+    async init(albums, title = $l10n("ALBUMS")) {
         this.title = title
 
         if (albums !== undefined) {

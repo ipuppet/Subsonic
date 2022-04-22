@@ -6,8 +6,7 @@ const {
 const Artist = require("./artist")
 
 class ArtistIndexes {
-    artistIndexes = {}
-    artistIndexesKeys = []
+    artists = []
 
     constructor(kernel) {
         this.kernel = kernel
@@ -23,17 +22,15 @@ class ArtistIndexes {
         return this
     }
 
-    async init() {
-        this.artistIndexes = await this.kernel.subsonic.getIndexes()
-        this.artistIndexesKeys = Object.keys(this.artistIndexes)
+    async init(artists = []) {
+        this.artists = artists
     }
 
     searchAction(text) { }
 
     get listData() {
-        return this.artistIndexesKeys.map(index => ({
-            title: index,
-            rows: this.artistIndexes[index].map(item => ({
+        return {
+            rows: this.artists.map(item => ({
                 info: { info: item },
                 image: {
                     src: item.artistImageUrl
@@ -45,7 +42,7 @@ class ArtistIndexes {
                     text: $l10n("ALBUMS") + ": " + item.albumCount
                 }
             }))
-        }))
+        }
     }
 
     get listTemplate() {
@@ -149,21 +146,6 @@ class ArtistIndexes {
             .setTitle($l10n("ARTISTS"))
             .setTitleView(searchBar)
             .setFixedFooterView(this.kernel.player.fixedFooterView())
-            .addRightButton({
-                symbol: "paperplane",
-                menu: {
-                    pullDown: true,
-                    asPrimary: true,
-                    items: this.artistIndexesKeys.map((index, i) => ({
-                        title: index,
-                        handler: () => {
-                            $(this.listId).scrollTo({
-                                indexPath: $indexPath(i, 0)
-                            })
-                        }
-                    }))
-                }
-            })
         pageController
             .navigationController
             .navigationBar
