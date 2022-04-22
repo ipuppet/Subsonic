@@ -19,6 +19,10 @@ class Star {
         this.fontSize = 22
         this.iconSize = 25
         this.rowHeight = 50
+
+        this.kernel.subsonic.getStarred2().then(starred => {
+            this.starred = starred
+        })
     }
 
     get listData() {
@@ -128,16 +132,10 @@ class Star {
                     const view = new Component(this.kernel)
                     sender.cell(indexPath).get("spinner").hidden = false
                     sender.cell(indexPath).get("rightBtn").hidden = true
-                    view.setViewController(this.viewController).init().then(() => {
+                    view.setViewController(this.viewController).init(this.starred[id]).then(() => {
                         sender.cell(indexPath).get("spinner").hidden = true
                         sender.cell(indexPath).get("rightBtn").hidden = false
-                        if (this.kernel.isUseJsboxNav) {
-                            UIKit.push({
-                                views: [view.getListView()]
-                            })
-                        } else {
-                            this.viewController.push(view.getPageController())
-                        }
+                        this.viewController.push(view.getPageController())
                     })
                 }
             }

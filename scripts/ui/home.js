@@ -41,7 +41,7 @@ class Home {
                 icon: "music.mic",
                 title: $l10n("ARTISTS"),
                 info: {
-                    id: "artists"
+                    id: "artistIndexes"
                 }
             }
         ]
@@ -131,13 +131,7 @@ class Home {
                     view.setViewController(this.viewController).init().then(() => {
                         sender.cell(indexPath).get("spinner").hidden = true
                         sender.cell(indexPath).get("rightBtn").hidden = false
-                        if (this.kernel.isUseJsboxNav) {
-                            UIKit.push({
-                                views: [view.getListView()]
-                            })
-                        } else {
-                            this.viewController.push(view.getPageController())
-                        }
+                        this.viewController.push(view.getPageController())
                     })
                 }
             }

@@ -82,7 +82,7 @@ class Subsonic {
         return $text.MD5(`${this.username}${this.password}${this.host}${method}${this.parseParameter(parameter)}`)
     }
 
-    request(method, parameter = {}, isCache = true) {
+    request(method, parameter = {}, useCache = true) {
         const displayError = message => {
             $ui.error(message)
             console.error(message)
@@ -101,7 +101,7 @@ class Subsonic {
 
         return new Promise(async (resolve, reject) => {
             try {
-                if (isCache) {
+                if (useCache) {
                     const cache = this.fileStorage.read("request", cacheKey).string
                     const xml = $xml.parse({
                         string: cache,
@@ -130,9 +130,7 @@ class Subsonic {
                     displayError(`code:[${errorElement.attributes.code}] ${errorElement.attributes.message}`)
                     reject(errorElement.attributes)
                 } else {
-                    if (isCache) {
-                        this.fileStorage.writeSync("request", cacheKey, $data({ "string": response.data }))
-                    }
+                    this.fileStorage.writeSync("request", cacheKey, $data({ "string": response.data }))
                     resolve(xml?.rootElement)
                 }
             }).catch(error => {
@@ -293,11 +291,11 @@ class Subsonic {
         return this.binary("getCoverArt", { id })
     }
 
-    getRandomSongs(size = 20) {
+    getRandomSongs(size = 20, refresh = false) {
         return new Promise(async (resolve, reject) => {
             this.request("getRandomSongs", {
                 size
-            }).then(root => {
+            }, !refresh).then(root => {
                 resolve(root.firstChild({
                     tag: "randomSongs"
                 }).children({
@@ -314,13 +312,13 @@ class Subsonic {
                     tag: "starred2"
                 })
                 const data = {
-                    artist: starred2.children({
+                    artists: starred2.children({
                         tag: "artist"
                     }).map(item => item.attributes),
-                    album: starred2.children({
+                    albums: starred2.children({
                         tag: "album"
                     }).map(item => item.attributes),
-                    song: starred2.children({
+                    songs: starred2.children({
                         tag: "song"
                     }).map(item => item.attributes)
                 }

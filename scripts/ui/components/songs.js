@@ -133,7 +133,7 @@ class Songs {
                 symbol: "arrow.clockwise",
                 tapped: animate => {
                     animate.start()
-                    this.kernel.subsonic.getRandomSongs().then(songs => {
+                    this.kernel.subsonic.getRandomSongs(20, true).then(songs => {
                         this.songs = songs
                         $(this.listId).data = this.listData
                         animate.done()

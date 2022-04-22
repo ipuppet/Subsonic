@@ -7,8 +7,9 @@ const {
     Setting
 } = require("./lib/easy-jsbox")
 const Subsonic = require("./lib/subsonic")
-const Home = require("./ui/home")
 const Player = require("./ui/components/player")
+const Home = require("./ui/home")
+const Star = require("./ui/star")
 
 const fileStorage = new FileStorage()
 
@@ -33,9 +34,11 @@ class AppKernel extends Kernel {
     }
 
     initComponents() {
-        // Clipboard
+        // Home
         this.home = new Home(this)
-        // player
+        // Star
+        this.star = new Star(this)
+        // Player
         this.player = new Player(this)
     }
 
@@ -134,13 +137,21 @@ class AppUI {
         const homePageController = kernel.home.getPageController()
         kernel.home.viewController.setRootPageController(homePageController)
 
+        const starPageController = kernel.star.getPageController()
+        kernel.star.viewController.setRootPageController(starPageController)
+
         kernel.tabBarController.setPages({
             home: homePageController.getPage(),
+            star: starPageController.getPage(),
             setting: kernel.setting.getPageView()
         }).setCells({
             home: {
                 icon: "square.stack",
                 title: $l10n("LIBRARY")
+            },
+            star: {
+                icon: "star",
+                title: $l10n("STAR")
             },
             setting: {
                 icon: "gear",

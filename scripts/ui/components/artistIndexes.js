@@ -11,7 +11,7 @@ class ArtistIndexes {
 
     constructor(kernel) {
         this.kernel = kernel
-        this.listId = "artists-list"
+        this.listId = "artist-indexes-list"
 
         this.leftOffset = 15
         this.imageSize = 50
