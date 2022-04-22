@@ -93,6 +93,17 @@ class Artists {
                         make.bottom.equalTo(view.prev.prev)
                         make.left.equalTo(view.prev)
                     }
+                },
+                {
+                    type: "spinner",
+                    props: {
+                        loading: true,
+                        hidden: true
+                    },
+                    layout: (make, view) => {
+                        make.right.inset(this.leftOffset)
+                        make.centerY.equalTo(view.super)
+                    }
                 }
             ]
         }
@@ -112,9 +123,16 @@ class Artists {
             layout: $layout.fill,
             events: {
                 didSelect: (sender, indexPath, data) => {
+                    // 防止重复点击
+                    if (sender.cell(indexPath).get("spinner").hidden === false) {
+                        return
+                    }
+
+                    sender.cell(indexPath).get("spinner").hidden = false
                     const id = data.info.info.id
                     const artist = new Artist(this.kernel)
                     artist.setViewController(this.viewController).init(id).then(() => {
+                        sender.cell(indexPath).get("spinner").hidden = true
                         this.viewController.push(artist.getPageController())
                     })
                 }

@@ -82,13 +82,27 @@ class Albums {
                     type: "image",
                     props: {
                         id: "image",
-                        smoothCorners: true,
                         cornerRadius: 10,
+                        smoothCorners: true,
                         menu: { items: this.menuItems(false) }
                     },
                     layout: make => {
                         make.top.left.inset(0)
                         make.size.equalTo($size(this.imageHeight, this.imageHeight))
+                    }
+                },
+                {
+                    type: "spinner",
+                    props: {
+                        cornerRadius: 10,
+                        smoothCorners: true,
+                        bgcolor: $rgba(0, 0, 0, 0.5),
+                        loading: true,
+                        hidden: true
+                    },
+                    layout: (make, view) => {
+                        make.size.equalTo(view.prev)
+                        make.edges.equalTo(view.prev)
                     }
                 },
                 {
@@ -132,8 +146,15 @@ class Albums {
             layout: $layout.fill,
             events: {
                 didSelect: (sender, indexPath, data) => {
+                    // 防止重复点击
+                    if (sender.cell(indexPath).get("spinner").hidden === false) {
+                        return
+                    }
+
+                    sender.cell(indexPath).get("spinner").hidden = false
                     const info = data.info.info
                     this.kernel.subsonic.getAlbum(info.id).then(album => {
+                        sender.cell(indexPath).get("spinner").hidden = true
                         const songs = new Songs(this.kernel)
                         songs.setViewController(this.viewController).init(album.songs, info.name)
                         this.viewController.push(songs.getPageController())
