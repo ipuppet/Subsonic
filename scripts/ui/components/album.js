@@ -87,7 +87,6 @@ class Album {
 
     get listData() {
         return this.album.songs.map(item => ({
-            info: { info: item },
             number: {
                 text: item.track
             },

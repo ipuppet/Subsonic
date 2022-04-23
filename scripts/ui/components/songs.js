@@ -16,6 +16,7 @@ class Songs {
         this.edgeOffset = 15
         this.imageSize = 50
         this.rowHeight = 60
+        this.starButtonWidth = 25
     }
 
     setViewController(viewController) {
@@ -82,7 +83,6 @@ class Songs {
 
     get listData() {
         return this.songs.map(item => ({
-            info: { info: item },
             image: {
                 src: this.kernel.subsonic.getCoverArt(item.coverArt)
             },
@@ -91,6 +91,9 @@ class Songs {
             },
             artist: {
                 text: item.artist
+            },
+            star: {
+                info: item
             }
         }))
     }
@@ -118,6 +121,7 @@ class Songs {
                         font: $font(18)
                     },
                     layout: (make, view) => {
+                        make.right.inset(this.edgeOffset * 2 + this.starButtonWidth)
                         make.left.equalTo(view.prev.right).offset(this.edgeOffset)
                         make.top.equalTo(view.prev).offset(5)
                     }
@@ -131,8 +135,77 @@ class Songs {
                         color: $color("secondaryText")
                     },
                     layout: (make, view) => {
+                        make.right.inset(this.edgeOffset * 2 + this.starButtonWidth)
                         make.left.equalTo(view.prev)
                         make.bottom.equalTo(view.prev.prev).offset(-5)
+                    }
+                },
+                {
+                    type: "button",
+                    props: {
+                        id: "star",
+                        bgcolor: $color("clear")
+                    },
+                    views: [
+                        {
+                            type: "image",
+                            props: {
+                                symbol: "star",
+                                info: { star: false },
+                                hidden: false
+                            },
+                            layout: (make, view) => {
+                                make.right.inset(this.edgeOffset)
+                                make.width.equalTo(this.starButtonWidth)
+                                make.centerY.equalTo(view.super)
+                            }
+                        },
+                        {
+                            type: "spinner",
+                            props: {
+                                loading: true,
+                                hidden: true
+                            },
+                            layout: (make, view) => {
+                                make.right.inset(this.edgeOffset)
+                                make.centerY.equalTo(view.super)
+                            }
+                        }
+                    ],
+                    events: {
+                        ready: sender => {
+                            if (this.kernel.subsonic.isStarred("songs", sender.info.id)) {
+                                sender.get("image").symbol = "star.fill"
+                                sender.get("image").info = { star: true }
+                            }
+                        },
+                        tapped: async sender => {
+                            // 防止重复点击
+                            if (sender.get("spinner").hidden === false) {
+                                return
+                            }
+
+                            sender.get("spinner").hidden = false
+                            sender.get("image").hidden = true
+
+                            if (sender.get("image").info.star) {
+                                await this.kernel.subsonic.unstar(sender.info.id)
+                                sender.get("image").symbol = "star"
+                                sender.get("image").info = { star: false }
+                            } else {
+                                await this.kernel.subsonic.star(sender.info.id)
+                                sender.get("image").symbol = "star.fill"
+                                sender.get("image").info = { star: true }
+                            }
+
+                            sender.get("spinner").hidden = true
+                            sender.get("image").hidden = false
+                        }
+                    },
+                    layout: (make, view) => {
+                        make.right.inset(0)
+                        make.width.equalTo(this.starButtonWidth + this.edgeOffset * 2)
+                        make.height.equalTo(view.super)
                     }
                 }
             ]

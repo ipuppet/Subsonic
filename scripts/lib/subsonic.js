@@ -19,6 +19,7 @@ class Subsonic {
     password
 
     parameter = {}
+    starred = {}
 
     constructor({ host, username, password, fileStorage } = {}) {
         if (host && host[host.length - 1] === "/") {
@@ -310,25 +311,60 @@ class Subsonic {
         })
     }
 
-    getStarred2(refresh = false) {
+    getStarred(refresh = false) {
         return new Promise(async (resolve, reject) => {
-            this.request("getStarred2", {}, !refresh).then(root => {
-                const starred2 = root.firstChild({
-                    tag: "starred2"
+            this.request("getStarred", {}, !refresh).then(root => {
+                const starred = root.firstChild({
+                    tag: "starred"
                 })
                 const data = {
-                    artists: starred2.children({
+                    artists: starred.children({
                         tag: "artist"
                     }).map(item => item.attributes),
-                    albums: starred2.children({
+                    albums: starred.children({
                         tag: "album"
                     }).map(item => item.attributes),
-                    songs: starred2.children({
+                    songs: starred.children({
                         tag: "song"
                     }).map(item => item.attributes)
                 }
-                resolve(data)
+                this.starred = data
+                resolve(this.starred)
             }).catch(e => reject(e))
+        })
+    }
+
+    isStarred(type, id) {
+        for (let i = 0; i < this.starred[type].length; i++) {
+            if (this.starred[type][i]?.id === id) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    star(id) {
+        return new Promise(async (resolve, reject) => {
+            const root = await this.request("star", { id }, false)
+            if (root?.attributes?.status === "ok") {
+                await this.getStarred(true)
+                resolve(true)
+            } else {
+                reject(false)
+            }
+        })
+    }
+
+    unstar(id) {
+        return new Promise(async (resolve, reject) => {
+            const root = await this.request("unstar", { id }, false)
+            if (root?.attributes?.status === "ok") {
+                await this.getStarred(true)
+                resolve(true)
+            } else {
+                reject(false)
+            }
         })
     }
 }
