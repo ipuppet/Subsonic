@@ -19,6 +19,7 @@ class Album {
         this.imageHeight = UIKit.windowSize.width * 0.6
         this.albumInfoHeight = 55
         this.rowHeight = 50
+        this.starButtonWidth = 25
     }
 
     setViewController(viewController) {
@@ -81,25 +82,28 @@ class Album {
         }
     }
 
-    get menuData() {
-        return {}
-    }
-
     get listData() {
         return this.album.songs.map(item => ({
             number: {
                 text: item.track
             },
-            image: {
-                src: this.kernel.subsonic.getCoverArt(item.coverArt)
-            },
             title: {
                 text: item.title
             },
-            artist: {
-                text: item.artist
+            star: {
+                info: item
             }
-        }))
+        })).map(data => {
+            const template = this.listTemplate
+            template.type = "view"
+            template.views = template.views.map(item => {
+                item.props = Object.assign(item.props, data[item.props.id])
+                return item
+            })
+            template.layout = $layout.fill
+
+            return template
+        })
     }
 
     get listTemplate() {
@@ -131,6 +135,75 @@ class Album {
                     layout: (make, view) => {
                         make.centerY.equalTo(view.super)
                         make.left.equalTo(view.prev.right).offset(this.edgeOffset / 2)
+                        make.right.inset(this.edgeOffset * 2 + this.starButtonWidth)
+                    }
+                },
+                {
+                    type: "button",
+                    props: {
+                        id: "star",
+                        bgcolor: $color("clear")
+                    },
+                    views: [
+                        {
+                            type: "image",
+                            props: {
+                                symbol: "star",
+                                info: { star: false },
+                                hidden: false
+                            },
+                            layout: (make, view) => {
+                                make.right.inset(this.edgeOffset)
+                                make.width.equalTo(this.starButtonWidth)
+                                make.centerY.equalTo(view.super)
+                            }
+                        },
+                        {
+                            type: "spinner",
+                            props: {
+                                loading: true,
+                                hidden: true
+                            },
+                            layout: (make, view) => {
+                                make.right.inset(this.edgeOffset)
+                                make.centerY.equalTo(view.super)
+                            }
+                        }
+                    ],
+                    events: {
+                        ready: sender => {
+                            if (this.kernel.subsonic.isStarred("songs", sender.info.id)) {
+                                sender.get("image").symbol = "star.fill"
+                                sender.get("image").info = { star: true }
+                            }
+                        },
+                        tapped: async sender => {
+                            // 防止重复点击
+                            if (sender.get("spinner").hidden === false) {
+                                return
+                            }
+
+                            sender.get("spinner").hidden = false
+                            sender.get("image").hidden = true
+
+                            if (sender.get("image").info.star) {
+                                await this.kernel.subsonic.unstar(sender.info.id)
+                                sender.get("image").symbol = "star"
+                                sender.get("image").info = { star: false }
+                            } else {
+                                await this.kernel.subsonic.star(sender.info.id)
+                                sender.get("image").symbol = "star.fill"
+                                sender.get("image").info = { star: true }
+                            }
+
+                            sender.get("spinner").hidden = true
+                            sender.get("image").hidden = false
+                        }
+                    },
+                    layout: (make, view) => {
+                        make.right.inset(0)
+                        make.width.equalTo(this.starButtonWidth + this.edgeOffset * 2)
+                        make.height.equalTo(view.super)
                     }
                 }
             ]
@@ -147,7 +220,7 @@ class Album {
                 rowHeight: this.rowHeight,
                 header: this.header ?? {},
                 data: this.listData,
-                template: this.listTemplate,
+                //template: this.listTemplate,
             },
             layout: $layout.fill,
             events: {

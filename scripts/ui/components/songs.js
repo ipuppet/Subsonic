@@ -77,10 +77,6 @@ class Songs {
         })
     }
 
-    get menuData() {
-        return {}
-    }
-
     get listData() {
         return this.songs.map(item => ({
             image: {
