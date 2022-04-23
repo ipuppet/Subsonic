@@ -16,11 +16,11 @@ class Artist {
     constructor(kernel) {
         this.kernel = kernel
 
-        this.leftOffset = 15
+        this.edgeOffset = 15
         this.imageSize = 50
         this.height = 60
         this.miniControlWith = 75
-        this.miniControlButtonSize = (this.miniControlWith - this.leftOffset) >> 1
+        this.miniControlButtonSize = (this.miniControlWith - this.edgeOffset) >> 1
 
         this.init()
     }
@@ -48,7 +48,7 @@ class Artist {
                         src: this.kernel.subsonic.getCoverArt(this.playNow.coverArt)
                     },
                     layout: make => {
-                        make.left.inset(this.leftOffset)
+                        make.left.inset(this.edgeOffset)
                         make.top.inset((this.height - this.imageSize) / 2)
                         make.size.equalTo(this.imageSize)
                     }
@@ -86,10 +86,10 @@ class Artist {
                         }
                     ],
                     layout: (make, view) => {
-                        make.left.equalTo(view.prev.right).offset(this.leftOffset)
+                        make.left.equalTo(view.prev.right).offset(this.edgeOffset)
                         make.top.equalTo(view.prev).offset(5)
                         make.bottom.equalTo(view.prev).offset(-5)
-                        make.right.inset(this.leftOffset).offset(-this.miniControlWith - this.leftOffset)
+                        make.right.inset(this.edgeOffset).offset(-this.miniControlWith - this.edgeOffset)
                     }
                 },
                 { // control
@@ -160,14 +160,14 @@ class Artist {
                             },
                             layout: (make, view) => {
                                 make.height.equalTo(view.super)
-                                make.left.equalTo(view.prev.right).offset(this.leftOffset - 5)
+                                make.left.equalTo(view.prev.right).offset(this.edgeOffset - 5)
                             }
                         }
                     ],
                     layout: (make, view) => {
                         make.width.equalTo(this.miniControlWith)
                         make.height.equalTo(view.super)
-                        make.right.inset(this.leftOffset)
+                        make.right.inset(this.edgeOffset)
                     }
                 }
             ]
@@ -253,7 +253,7 @@ class Artist {
                 console.log("failedToPlayToEndTime")
             },
             playbackStalled: () => {
-                console.log("started")
+                console.log("Stalled")
             },
             newAccessLogEntry: () => {
                 console.log("newAccessLogEntry")

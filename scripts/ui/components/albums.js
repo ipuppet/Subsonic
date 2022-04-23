@@ -3,7 +3,7 @@ const {
     PageController,
     SearchBar
 } = require("../../lib/easy-jsbox")
-const Songs = require("./songs")
+const Album = require("./album")
 
 class Albums {
     title
@@ -46,7 +46,7 @@ class Albums {
 
     searchAction(text) { }
 
-    menuItems(isStar) {
+    get menuItems() {
         return []
     }
 
@@ -83,8 +83,7 @@ class Albums {
                     props: {
                         id: "image",
                         cornerRadius: 10,
-                        smoothCorners: true,
-                        menu: { items: this.menuItems(false) }
+                        smoothCorners: true
                     },
                     layout: make => {
                         make.top.left.inset(0)
@@ -152,13 +151,13 @@ class Albums {
                     }
 
                     sender.cell(indexPath).get("spinner").hidden = false
-                    const info = data.info.info
-                    this.kernel.subsonic.getAlbum(info.id).then(album => {
-                        sender.cell(indexPath).get("spinner").hidden = true
-                        const songs = new Songs(this.kernel)
-                        songs.setViewController(this.viewController).init(album.songs, info.name)
-                        this.viewController.push(songs.getPageController())
-                    })
+                    const albums = new Album(this.kernel)
+                    albums.setViewController(this.viewController)
+                        .init(data.info.info.id)
+                        .then(() => {
+                            sender.cell(indexPath).get("spinner").hidden = true
+                            this.viewController.push(albums.getPageController())
+                        })
                 },
                 didReachBottom: sender => {
                     if (!this.hasSource) {

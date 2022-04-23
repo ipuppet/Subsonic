@@ -15,7 +15,7 @@ class Star {
             this.kernel.player.updateControlButton()
         })
 
-        this.leftOffset = 15
+        this.edgeOffset = 15
         this.fontSize = 22
         this.iconSize = 25
         this.rowHeight = 50
@@ -67,7 +67,7 @@ class Star {
             props: {
                 id: this.listId,
                 bgcolor: UIKit.primaryViewBackgroundColor,
-                separatorInset: $insets(0, this.leftOffset, 0, 0),
+                separatorInset: $insets(0, this.edgeOffset, 0, 0),
                 rowHeight: this.rowHeight,
                 data: this.listData,
                 template: {
@@ -82,7 +82,7 @@ class Star {
                             },
                             layout: (make, view) => {
                                 make.centerY.equalTo(view.super)
-                                make.right.inset(this.leftOffset)
+                                make.right.inset(this.edgeOffset)
                                 make.size.equalTo(15)
                             }
                         },
@@ -103,7 +103,7 @@ class Star {
                                 id: "icon"
                             },
                             layout: make => {
-                                make.left.inset(this.leftOffset)
+                                make.left.inset(this.edgeOffset)
                                 make.top.inset((this.rowHeight - this.iconSize) / 2)
                                 make.height.equalTo(this.iconSize)
                             }
@@ -118,7 +118,7 @@ class Star {
                             layout: (make, view) => {
                                 make.centerY.right.equalTo(view.super)
                                 make.height.equalTo(this.rowHeight)
-                                make.left.equalTo(this.iconSize + this.leftOffset * 2)
+                                make.left.equalTo(this.iconSize + this.edgeOffset * 2)
                             }
                         }
                     ]

@@ -13,7 +13,7 @@ class Songs {
         this.kernel = kernel
         this.listId = "songs-list"
 
-        this.leftOffset = 15
+        this.edgeOffset = 15
         this.imageSize = 50
         this.rowHeight = 60
     }
@@ -110,7 +110,7 @@ class Songs {
                         id: "image"
                     },
                     layout: make => {
-                        make.left.inset(this.leftOffset)
+                        make.left.inset(this.edgeOffset)
                         make.top.inset((this.rowHeight - this.imageSize) / 2)
                         make.size.equalTo(this.imageSize)
                     }
@@ -123,7 +123,7 @@ class Songs {
                         font: $font(18)
                     },
                     layout: (make, view) => {
-                        make.left.equalTo(view.prev.right).offset(this.leftOffset)
+                        make.left.equalTo(view.prev.right).offset(this.edgeOffset)
                         make.top.equalTo(view.prev).offset(5)
                     }
                 },
@@ -150,7 +150,7 @@ class Songs {
             props: {
                 id: this.listId,
                 bgcolor: UIKit.primaryViewBackgroundColor,
-                separatorInset: $insets(0, this.imageSize + this.leftOffset * 2, 0, 0),
+                separatorInset: $insets(0, this.imageSize + this.edgeOffset * 2, 0, 0),
                 rowHeight: this.rowHeight,
                 data: this.listData,
                 template: this.listTemplate,

@@ -13,7 +13,7 @@ class ArtistIndexes {
         this.kernel = kernel
         this.listId = "artist-indexes-list"
 
-        this.leftOffset = 15
+        this.edgeOffset = 15
         this.imageSize = 50
         this.rowHeight = 60
     }
@@ -64,7 +64,7 @@ class ArtistIndexes {
                         smoothCorners: true
                     },
                     layout: make => {
-                        make.left.inset(this.leftOffset)
+                        make.left.inset(this.edgeOffset)
                         make.top.inset((this.rowHeight - this.imageSize) / 2)
                         make.size.equalTo(this.imageSize)
                     }
@@ -77,7 +77,7 @@ class ArtistIndexes {
                         font: $font(22)
                     },
                     layout: (make, view) => {
-                        make.left.equalTo(view.prev.right).offset(this.leftOffset)
+                        make.left.equalTo(view.prev.right).offset(this.edgeOffset)
                         make.top.equalTo(view.prev)
                     }
                 },
@@ -101,7 +101,7 @@ class ArtistIndexes {
                         hidden: true
                     },
                     layout: (make, view) => {
-                        make.right.inset(this.leftOffset)
+                        make.right.inset(this.edgeOffset)
                         make.centerY.equalTo(view.super)
                     }
                 }
