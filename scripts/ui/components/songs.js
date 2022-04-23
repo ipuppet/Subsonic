@@ -30,12 +30,7 @@ class Songs {
             this.songs = songs
             this.hasSource = true
         } else {
-            return new Promise(async (resolve, reject) => {
-                await this.kernel.subsonic.getRandomSongs().then(songs => {
-                    this.songs = songs
-                    resolve()
-                }).catch(error => reject(error))
-            })
+            this.songs = await this.kernel.subsonic.getRandomSongs()
         }
     }
 

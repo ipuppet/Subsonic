@@ -27,9 +27,7 @@ class Album {
     }
 
     async init(albumId) {
-        await this.kernel.subsonic.getAlbum(albumId).then(album => {
-            this.album = album
-        })
+        this.album = await this.kernel.subsonic.getAlbum(albumId)
     }
 
     get header() {

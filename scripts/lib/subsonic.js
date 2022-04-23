@@ -83,9 +83,9 @@ class Subsonic {
     }
 
     request(method, parameter = {}, useCache = true) {
-        const displayError = message => {
-            $ui.error(message)
-            console.error(message)
+        const displayError = error => {
+            $ui.error(error.localizedDescription ?? error)
+            console.error(error)
         }
 
         try {
@@ -115,6 +115,10 @@ class Subsonic {
             $http.get({
                 url: this.url(method, parameter)
             }).then(response => {
+                if (response.error) {
+                    throw response.error
+                }
+
                 if (response.data.startsWith("4") || response.data.startsWith("5")) {
                     throw new Error(response.data)
                 }
@@ -123,6 +127,7 @@ class Subsonic {
                     string: response.data,
                     mode: "xml"
                 })
+
                 if (xml?.rootElement?.attributes?.status === "failed") {
                     const errorElement = xml?.rootElement?.firstChild({
                         tag: "error"
@@ -305,9 +310,9 @@ class Subsonic {
         })
     }
 
-    getStarred2() {
+    getStarred2(refresh = false) {
         return new Promise(async (resolve, reject) => {
-            this.request("getStarred2").then(root => {
+            this.request("getStarred2", {}, !refresh).then(root => {
                 const starred2 = root.firstChild({
                     tag: "starred2"
                 })

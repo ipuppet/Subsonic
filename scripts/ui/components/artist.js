@@ -14,9 +14,7 @@ class Artist {
     }
 
     async init(id) {
-        await this.kernel.subsonic.getArtist(id).then(artist => {
-            this.artist = artist
-        })
+        this.artist = await this.kernel.subsonic.getArtist(id)
     }
 
     getPageController() {

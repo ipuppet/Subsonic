@@ -34,13 +34,8 @@ class Albums {
             this.albums = albums
             this.hasSource = true
         } else {
-            return new Promise(async (resolve, reject) => {
-                await this.kernel.subsonic.getAlbumList2(this.pageSize, this.pageSize * this.page).then(albums => {
-                    ++this.page
-                    this.albums = albums
-                    resolve()
-                }).catch(error => reject(error))
-            })
+            this.albums = await this.kernel.subsonic.getAlbumList2(this.pageSize, this.pageSize * this.page)
+            ++this.page
         }
     }
 

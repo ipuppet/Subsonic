@@ -20,9 +20,11 @@ class Star {
         this.iconSize = 25
         this.rowHeight = 50
 
-        this.kernel.subsonic.getStarred2().then(starred => {
-            this.starred = starred
-        })
+        this.init()
+    }
+
+    async init(refresh = false) {
+        this.starred = await this.kernel.subsonic.getStarred2(refresh)
     }
 
     get listData() {
@@ -146,6 +148,17 @@ class Star {
         const pageController = new PageController()
         pageController.navigationItem
             .setTitle($l10n("STAR"))
+            .addRightButton({
+                symbol: "arrow.clockwise",
+                tapped: animate => {
+                    animate.start()
+                    this.init(true).then(() => {
+                        animate.done()
+                    }).catch(() => {
+                        animate.cancel()
+                    })
+                }
+            })
         pageController
             .navigationController
             .navigationBar
