@@ -9,7 +9,6 @@ class Album {
         name: $l10n("SONGS"),
         songs: []
     }
-    hasSource = false
 
     constructor(kernel) {
         this.kernel = kernel
@@ -168,22 +167,6 @@ class Album {
         pageController.navigationItem
             .setTitle(this.album.name)
             .setFixedFooterView(this.kernel.player.fixedFooterView())
-        if (!this.hasSource) {
-            pageController.navigationItem.addRightButton({
-                symbol: "arrow.clockwise",
-                tapped: animate => {
-                    animate.start()
-                    this.kernel.subsonic.getRandomSongs(20, true).then(songs => {
-                        this.album.songs = songs
-                        $(this.listId).data = this.listData
-                        animate.done()
-                    }).catch(error => {
-                        this.kernel.print(error)
-                        animate.cancel()
-                    })
-                }
-            })
-        }
         pageController
             .navigationController
             .navigationBar
