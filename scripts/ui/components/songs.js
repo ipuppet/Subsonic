@@ -95,7 +95,17 @@ class Songs {
             star: {
                 info: item
             }
-        }))
+        })).map(data => {
+            const template = this.listTemplate
+            template.type = "view"
+            template.views = template.views.map(item => {
+                item.props = Object.assign(item.props, data[item.props.id])
+                return item
+            })
+            template.layout = $layout.fill
+
+            return template
+        })
     }
 
     get listTemplate() {
@@ -221,7 +231,6 @@ class Songs {
                 separatorInset: $insets(0, this.imageSize + this.edgeOffset * 2, 0, 0),
                 rowHeight: this.rowHeight,
                 data: this.listData,
-                template: this.listTemplate,
             },
             layout: $layout.fill,
             events: {
