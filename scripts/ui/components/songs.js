@@ -78,127 +78,111 @@ class Songs {
     }
 
     get listData() {
-        return this.songs.map(item => Songs.listTemplate(item, this.infoViews(item), this.kernel))
-    }
-
-    infoViews(item) {
-        return [
-            {
-                type: "image",
-                props: {
-                    id: "image",
-                    src: this.kernel.subsonic.getCoverArt(item.coverArt)
-                },
-                layout: make => {
-                    make.left.inset(this.edgeOffset)
-                    make.top.inset((this.rowHeight - this.imageSize) / 2)
-                    make.size.equalTo(this.imageSize)
-                }
+        return this.songs.map(item => ({
+            image: {
+                src: this.kernel.subsonic.getCoverArt(item.coverArt)
             },
-            {
-                type: "label",
-                props: {
-                    id: "title",
-                    lines: 1,
-                    font: $font(18),
-                    text: item.title
-                },
-                layout: (make, view) => {
-                    make.right.inset(this.edgeOffset * 2 + this.starButtonWidth)
-                    make.left.equalTo(view.prev.right).offset(this.edgeOffset)
-                    make.top.equalTo(view.prev).offset(5)
-                }
+            title: {
+                text: item.title
             },
-            {
-                type: "label",
-                props: {
-                    id: "artist",
-                    lines: 1,
-                    font: $font(14),
-                    color: $color("secondaryText"),
-                    text: item.artist
-                },
-                layout: (make, view) => {
-                    make.right.inset(this.edgeOffset * 2 + this.starButtonWidth)
-                    make.left.equalTo(view.prev)
-                    make.bottom.equalTo(view.prev.prev).offset(-5)
-                }
+            artist: {
+                text: item.artist
+            },
+            star: {
+                info: item,
+                symbol: this.kernel.subsonic.isStarred("songs", item.id) ? "star.fill" : "star"
             }
-        ]
+        }))
     }
 
-    static listTemplate(item, infoViews, kernel, starButtonWidth = 25, edgeOffset = 15) {
+    get listTemplate() {
         return {
-            type: "view",
             props: { bgcolor: $color("clear") },
-            views: infoViews.concat({
-                type: "button",
-                props: {
-                    id: "star",
-                    bgcolor: $color("clear")
+            views: [
+                {
+                    type: "image",
+                    props: {
+                        id: "image"
+                    },
+                    layout: make => {
+                        make.left.inset(this.edgeOffset)
+                        make.top.inset((this.rowHeight - this.imageSize) / 2)
+                        make.size.equalTo(this.imageSize)
+                    }
                 },
-                views: [
-                    {
-                        type: "image",
-                        props: {
-                            symbol: kernel.subsonic.isStarred("songs", item.id) ? "star.fill" : "star",
-                            info: { star: kernel.subsonic.isStarred("songs", item.id) },
-                            hidden: false
-                        },
-                        layout: (make, view) => {
-                            make.right.inset(edgeOffset)
-                            make.width.equalTo(starButtonWidth)
-                            make.centerY.equalTo(view.super)
+                {
+                    type: "label",
+                    props: {
+                        id: "title",
+                        lines: 1,
+                        font: $font(18)
+                    },
+                    layout: (make, view) => {
+                        make.right.inset(this.edgeOffset * 2 + this.starButtonWidth)
+                        make.left.equalTo(view.prev.right).offset(this.edgeOffset)
+                        make.top.equalTo(view.prev).offset(5)
+                    }
+                },
+                {
+                    type: "label",
+                    props: {
+                        id: "artist",
+                        lines: 1,
+                        font: $font(14),
+                        color: $color("secondaryText")
+                    },
+                    layout: (make, view) => {
+                        make.right.inset(this.edgeOffset * 2 + this.starButtonWidth)
+                        make.left.equalTo(view.prev)
+                        make.bottom.equalTo(view.prev.prev).offset(-5)
+                    }
+                },
+                {
+                    type: "spinner",
+                    props: {
+                        loading: true,
+                        hidden: true
+                    },
+                    layout: (make, view) => {
+                        make.right.inset(this.edgeOffset)
+                        make.centerY.equalTo(view.super)
+                    }
+                },
+                {
+                    type: "button",
+                    props: {
+                        id: "star",
+                        bgcolor: $color("clear")
+                    },
+                    events: {
+                        tapped: async sender => {
+                            // 防止重复点击
+                            if (sender.prev.hidden === false) {
+                                return
+                            }
+
+                            sender.prev.hidden = false
+                            sender.hidden = true
+
+                            if (sender.symbol === "star") {
+                                await this.kernel.subsonic.star(sender.info.id)
+                            } else {
+                                await this.kernel.subsonic.unstar(sender.info.id)
+                            }
+
+                            sender.prev.hidden = true
+                            sender.hidden = false
+
+                            $(this.listId).data = this.listData
                         }
                     },
-                    {
-                        type: "spinner",
-                        props: {
-                            loading: true,
-                            hidden: true
-                        },
-                        layout: (make, view) => {
-                            make.right.inset(edgeOffset)
-                            make.centerY.equalTo(view.super)
-                        }
+                    layout: (make, view) => {
+                        make.right.inset(0)
+                        make.width.equalTo(this.starButtonWidth + this.edgeOffset * 2)
+                        make.height.equalTo(view.super)
                     }
-                ],
-                events: {
-                    tapped: async sender => {
-                        // 防止重复点击
-                        if (sender.get("spinner").hidden === false) {
-                            return
-                        }
-
-                        sender.get("spinner").hidden = false
-                        sender.get("image").hidden = true
-
-                        if (sender.get("image").info.star) {
-                            await kernel.subsonic.unstar(sender.info.id)
-                            sender.get("image").symbol = "star"
-                            sender.get("image").info = { star: false }
-                        } else {
-                            await kernel.subsonic.star(sender.info.id)
-                            sender.get("image").symbol = "star.fill"
-                            sender.get("image").info = { star: true }
-                        }
-
-                        sender.get("spinner").hidden = true
-                        sender.get("image").hidden = false
-                    }
-                },
-                layout: (make, view) => {
-                    make.right.inset(0)
-                    make.width.equalTo(starButtonWidth + edgeOffset * 2)
-                    make.height.equalTo(view.super)
                 }
-            }),
-            events: {
-                tapped: () => {
-                    kernel.player.insert(item)
-                }
-            },
-            layout: $layout.fill
+            ]
         }
     }
 
@@ -210,7 +194,14 @@ class Songs {
                 bgcolor: UIKit.primaryViewBackgroundColor,
                 separatorInset: $insets(0, this.imageSize + this.edgeOffset * 2, 0, 0),
                 rowHeight: this.rowHeight,
-                data: this.listData
+                data: this.listData,
+                template: this.listTemplate
+            },
+            events: {
+                didSelect: (sender, indexPath, data) => {
+                    const info = data.star.info
+                    this.kernel.player.insert(info)
+                }
             },
             layout: $layout.fill
         }

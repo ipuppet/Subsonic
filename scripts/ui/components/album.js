@@ -2,7 +2,6 @@ const {
     UIKit,
     PageController
 } = require("../../lib/easy-jsbox")
-const Songs = require("./songs")
 
 class Album {
     title
@@ -84,42 +83,99 @@ class Album {
     }
 
     get listData() {
-        return this.album.songs.map(item => Songs.listTemplate(item, this.infoViews(item), this.kernel))
+        return this.album.songs.map(item => ({
+            number: {
+                text: item.track
+            },
+            title: {
+                text: item.title
+            },
+            star: {
+                info: item,
+                symbol: this.kernel.subsonic.isStarred("songs", item.id) ? "star.fill" : "star"
+            }
+        }))
     }
 
-    infoViews(item) {
-        return [
-            {
-                type: "label",
-                props: {
-                    id: "number",
-                    lines: 1,
-                    align: $align.center,
-                    color: $color("secondaryText"),
-                    font: $font(16),
-                    text: item.track
+    get listTemplate() {
+        return {
+            props: { bgcolor: $color("clear") },
+            views: [
+                {
+                    type: "label",
+                    props: {
+                        id: "number",
+                        lines: 1,
+                        align: $align.center,
+                        color: $color("secondaryText"),
+                        font: $font(16)
+                    },
+                    layout: (make, view) => {
+                        make.centerY.equalTo(view.super)
+                        make.width.equalTo(this.numberWidth)
+                        make.left.equalTo(view.super.safeArea).offset(this.edgeOffset)
+                    }
                 },
-                layout: (make, view) => {
-                    make.centerY.equalTo(view.super)
-                    make.width.equalTo(this.numberWidth)
-                    make.left.equalTo(view.super.safeArea).offset(this.edgeOffset)
-                }
-            },
-            {
-                type: "label",
-                props: {
-                    id: "title",
-                    lines: 1,
-                    font: $font(16),
-                    text: item.title
+                {
+                    type: "label",
+                    props: {
+                        id: "title",
+                        lines: 1,
+                        font: $font(16)
+                    },
+                    layout: (make, view) => {
+                        make.centerY.equalTo(view.super)
+                        make.left.equalTo(view.prev.right).offset(this.edgeOffset / 2)
+                        make.right.inset(this.edgeOffset * 2 + this.starButtonWidth)
+                    }
                 },
-                layout: (make, view) => {
-                    make.centerY.equalTo(view.super)
-                    make.left.equalTo(view.prev.right).offset(this.edgeOffset / 2)
-                    make.right.inset(this.edgeOffset * 2 + this.starButtonWidth)
+                {
+                    type: "spinner",
+                    props: {
+                        loading: true,
+                        hidden: true
+                    },
+                    layout: (make, view) => {
+                        make.right.inset(this.edgeOffset)
+                        make.centerY.equalTo(view.super)
+                    }
+                },
+                {
+                    type: "button",
+                    props: {
+                        id: "star",
+                        bgcolor: $color("clear")
+                    },
+                    events: {
+                        tapped: async sender => {
+                            // 防止重复点击
+                            if (sender.prev.hidden === false) {
+                                return
+                            }
+
+                            sender.prev.hidden = false
+                            sender.hidden = true
+
+                            if (sender.symbol === "star") {
+                                await this.kernel.subsonic.star(sender.info.id)
+                            } else {
+                                await this.kernel.subsonic.unstar(sender.info.id)
+                            }
+
+                            sender.prev.hidden = true
+                            sender.hidden = false
+
+                            $(this.listId).data = this.listData
+                        }
+                    },
+                    layout: (make, view) => {
+                        make.right.inset(0)
+                        make.width.equalTo(this.starButtonWidth + this.edgeOffset * 2)
+                        make.height.equalTo(view.super)
+                    }
                 }
-            }
-        ]
+            ]
+        }
     }
 
     getListView() {
@@ -131,12 +187,13 @@ class Album {
                 separatorInset: $insets(0, this.numberWidth + this.edgeOffset * 1.5, 0, 0),
                 rowHeight: this.rowHeight,
                 header: this.header ?? {},
-                data: this.listData
+                data: this.listData,
+                template: this.listTemplate
             },
             layout: $layout.fill,
             events: {
                 didSelect: (sender, indexPath, data) => {
-                    const info = data.info.info
+                    const info = data.star.info
                     this.kernel.player.insert(info)
                 }
             }
