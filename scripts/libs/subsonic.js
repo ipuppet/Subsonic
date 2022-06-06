@@ -170,9 +170,9 @@ class Subsonic {
     song(id, isCache = true) {
         const url = this.url("stream", {
             id,
-            format: "mp3"
+            // format: "mp3"
         })
-        const cacheKey = id + ".mp3"
+        const cacheKey = id + ".flac"
         if (!isCache) {
             return url
         }

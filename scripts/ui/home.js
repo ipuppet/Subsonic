@@ -2,7 +2,7 @@ const {
     UIKit,
     PageController,
     ViewController
-} = require("../lib/easy-jsbox")
+} = require("../libs/easy-jsbox")
 
 class Home {
     constructor(kernel) {

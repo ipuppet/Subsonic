@@ -5,8 +5,8 @@ const {
     Kernel,
     FileStorage,
     Setting
-} = require("./lib/easy-jsbox")
-const Subsonic = require("./lib/subsonic")
+} = require("./libs/easy-jsbox")
+const Subsonic = require("./libs/subsonic")
 const Player = require("./ui/components/player")
 const Home = require("./ui/home")
 const Star = require("./ui/star")
@@ -67,7 +67,7 @@ class AppKernel extends Kernel {
             this.checkUpdate(content => {
                 $file.write({
                     data: $data({ string: content }),
-                    path: "scripts/lib/easy-jsbox.js"
+                    path: "scripts/libs/easy-jsbox.js"
                 })
                 $ui.toast("The framework has been updated.")
             })

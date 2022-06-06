@@ -2,7 +2,7 @@ const {
     UIKit,
     PageController,
     SearchBar
-} = require("../../lib/easy-jsbox")
+} = require("../../libs/easy-jsbox")
 const Album = require("./album")
 
 class Albums {

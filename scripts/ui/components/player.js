@@ -2,7 +2,7 @@ const {
     UIKit,
     FixedFooterView,
     TabBarHeaderView
-} = require("../../lib/easy-jsbox")
+} = require("../../libs/easy-jsbox")
 
 class Artist {
     baseId = []
@@ -115,20 +115,7 @@ class Artist {
                             ],
                             events: {
                                 tapped: () => {
-                                    if ($audio.status === 2) {
-                                        this.pause()
-                                    } else if (!this.isStop) {
-                                        this.resume()
-                                    } else {
-                                        if (this.loadFromHistory) {
-                                            this.play(this.palyList[this.playIndex])
-                                        } else {
-                                            this.kernel.subsonic.getRandomSongs().then(songs => {
-                                                this.palyList = songs
-                                                this.play(this.palyList[this.playIndex])
-                                            }).catch(error => this.kernel.print(error))
-                                        }
-                                    }
+                                    this.miniController()
                                 }
                             },
                             layout: (make, view) => {
@@ -174,6 +161,23 @@ class Artist {
         }
     }
 
+    miniController() {
+        if ($audio.status !== 0) {
+            this.pause()
+        } else if (!this.isStop) {
+            this.resume()
+        } else {
+            if (this.loadFromHistory) {
+                this.play(this.palyList[this.playIndex])
+            } else {
+                this.kernel.subsonic.getRandomSongs().then(songs => {
+                    this.palyList = songs
+                    this.play(this.palyList[this.playIndex])
+                }).catch(error => this.kernel.print(error))
+            }
+        }
+    }
+
     tabBarHeader(baseId) {
         return new TabBarHeaderView(this.miniView(baseId))
     }
@@ -209,7 +213,6 @@ class Artist {
 
     stop() {
         this.isStop = true
-        this.playIndex = 0
         $audio.stop()
         this.updateControlButton(1)
     }
@@ -229,6 +232,7 @@ class Artist {
             ++this.playIndex
             this.play(this.palyList[this.playIndex])
         } else {
+            this.playIndex = 0
             this.stop()
         }
     }
@@ -245,9 +249,11 @@ class Artist {
             itemEnded: () => {
                 console.log("itemEnded")
             },
-            timeJumped: () => { },
+            timeJumped: t => {
+                console.log(t)
+            },
             didPlayToEndTime: () => {
-                console.log("didPlayToEndTime")
+                this.stop()
             },
             failedToPlayToEndTime: () => {
                 console.log("failedToPlayToEndTime")

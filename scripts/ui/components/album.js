@@ -1,7 +1,7 @@
 const {
     UIKit,
     PageController
-} = require("../../lib/easy-jsbox")
+} = require("../../libs/easy-jsbox")
 
 class Album {
     title
